@@ -569,6 +569,7 @@ dependencies = [
 name = "minebot-2"
 version = "0.1.0"
 dependencies = [
+ "chrono",
  "discord",
  "num-format",
  "reqwest",

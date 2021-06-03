@@ -4,6 +4,7 @@ use discord::model::{
 };
 use discord::Discord;
 use num_format::{Locale, ToFormattedString};
+use chrono::prelude::*;
 
 mod stats;
 mod interp;
@@ -25,6 +26,15 @@ fn get_env_var(name: &str) -> String {
 // Formats numbers
 fn n(num: i64) -> String {
     num.to_formatted_string(&Locale::en)
+}
+// Formats durations
+fn d(duration_secs: i64) -> String {
+    let dur = chrono::Duration::seconds(duration_secs);
+    let dur_hrs = dur.num_hours();
+    let dur_mins = dur.num_minutes() - dur_hrs * 60;
+    let dur_secs = dur.num_seconds() - dur.num_minutes() * 60;
+    let dur_years = dur.num_days() / 365;
+    format!("`{}h {}m {}s` _({} years!)_", n(dur_hrs), n(dur_mins), n(dur_secs), n(dur_years))
 }
 
 fn main() {
@@ -53,7 +63,7 @@ fn main() {
 
     let mut fetched = stats::fetch_stats();
     let mut fetched_next = stats::fetch_stats();
-    let mut fetch_timestamp = time::SystemTime::now();
+    let mut fetch_timestamp = Utc::now();
 
     loop {
         refetch_timer += UPDATE_PERIOD;
@@ -63,19 +73,19 @@ fn main() {
 
             fetched = fetched_next.clone();
             fetched_next = stats::fetch_stats();
-            fetch_timestamp = time::SystemTime::now();
+            fetch_timestamp = Utc::now();
         }
 
         let values = interp::interp_stats(&fetched, &fetched_next, fetch_timestamp);
 
         let msg_content = format!("
-**Cubes attempted:** {}
-**Cubes exploded:** {}
-**Cubes solved:** {}
-**Players:** {}
+**Cubes attempted:** `{}`
+**Cubes exploded:** `{}`
+**Cubes solved:** `{}`
+**Players:** `{}`
 **Combined time played:** {}",
         n(values["gamesPlayed"]), n(values["cubesExploded"]), n(values["cubesSolved"]),
-        n(values["playerCount"]), values["playTimeSeconds"]);
+        n(values["playerCount"]), d(values["playTimeSeconds"]));
 
         discord.edit_message(channel_id, message_id, &msg_content).unwrap();
 
