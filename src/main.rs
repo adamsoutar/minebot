@@ -3,6 +3,7 @@ use discord::model::{
     ChannelId, MessageId, Game, GameType, OnlineStatus
 };
 use discord::Discord;
+use num_format::{Locale, ToFormattedString};
 
 mod stats;
 mod interp;
@@ -20,6 +21,10 @@ static INTERP_FIELDS: &[&str] = &[
 fn get_env_var(name: &str) -> String {
     env::var(name)
         .expect(&format!("Missing {} env var", name)[..])
+}
+// Formats numbers
+fn n(num: i64) -> String {
+    num.to_formatted_string(&Locale::en)
 }
 
 fn main() {
@@ -69,8 +74,8 @@ fn main() {
 **Cubes solved:** {}
 **Players:** {}
 **Combined time played:** {}",
-        values["gamesPlayed"], values["cubesExploded"], values["cubesSolved"],
-        values["playerCount"], values["playTimeSeconds"]);
+        n(values["gamesPlayed"]), n(values["cubesExploded"]), n(values["cubesSolved"]),
+        n(values["playerCount"]), values["playTimeSeconds"]);
 
         discord.edit_message(channel_id, message_id, &msg_content).unwrap();
 
