@@ -63,8 +63,7 @@ fn main() {
 
     let mut fetched = stats::fetch_stats()
         .unwrap_or(stats::blank_stats());
-    let mut fetched_next = stats::fetch_stats()
-        .unwrap_or(stats::blank_stats());
+    let mut fetched_next = fetched.clone();
     let mut fetch_timestamp = Utc::now();
 
     loop {
