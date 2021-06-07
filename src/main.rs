@@ -3,11 +3,12 @@ use discord::model::{
     ChannelId, MessageId, Game, GameType, OnlineStatus
 };
 use discord::Discord;
-use num_format::{Locale, ToFormattedString};
 use chrono::prelude::*;
+use crate::formatting::{n, d};
 
 mod stats;
 mod interp;
+mod formatting;
 
 // Bot will interpolate and edit the message every $this seconds
 static UPDATE_PERIOD: u64 = 1000;
@@ -22,19 +23,6 @@ static INTERP_FIELDS: &[&str] = &[
 fn get_env_var(name: &str) -> String {
     env::var(name)
         .expect(&format!("Missing {} env var", name)[..])
-}
-// Formats numbers
-fn n(num: i64) -> String {
-    num.to_formatted_string(&Locale::en)
-}
-// Formats durations
-fn d(duration_secs: i64) -> String {
-    let dur = chrono::Duration::seconds(duration_secs);
-    let dur_hrs = dur.num_hours();
-    let dur_mins = dur.num_minutes() - dur_hrs * 60;
-    let dur_secs = dur.num_seconds() - dur.num_minutes() * 60;
-    let dur_years = dur.num_days() / 365;
-    format!("`{}h {}m {}s` _({} years!)_", n(dur_hrs), n(dur_mins), n(dur_secs), n(dur_years))
 }
 
 fn main() {
