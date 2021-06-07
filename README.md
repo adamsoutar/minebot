@@ -16,3 +16,5 @@ developers that would like to take a look at the code.
 
 Pull requests are welcome, though they might not be reviewed/accepted in a timely
 manner as development on Mastermine Multiplayer is well underway at the moment!
+
+[![hits](https://hitsbadge.vercel.app/api/badge?id=minebot-readme)](https://github.com/adamsoutar/hitsbadge)
