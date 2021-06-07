@@ -69,11 +69,11 @@ fn main() {
         let values = interp::interp_stats(&fetched, &fetched_next, fetch_timestamp);
 
         let msg_content = format!("
-**Cubes attempted:** `{}`
-**Cubes exploded:** `{}`
-**Cubes solved:** `{}`
-**Players:** `{}`
-**Combined time played:** {}",
+:logo: **Cubes attempted:** `{}`
+:explodedMine: **Cubes exploded:** `{}`
+:tileFlagged: **Cubes solved:** `{}`
+:raising_hand: **Players:** `{}`
+:stopwatch: **Combined time played:** {}",
         n(values["gamesPlayed"]), n(values["cubesExploded"]), n(values["cubesSolved"]),
         n(values["playerCount"]), d(values["playTimeSeconds"]));
 
