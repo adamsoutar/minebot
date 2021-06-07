@@ -61,8 +61,10 @@ fn main() {
     let update_time = time::Duration::from_millis(UPDATE_PERIOD);
     let mut refetch_timer = 0;
 
-    let mut fetched = stats::fetch_stats();
-    let mut fetched_next = stats::fetch_stats();
+    let mut fetched = stats::fetch_stats()
+        .unwrap_or(stats::blank_stats());
+    let mut fetched_next = stats::fetch_stats()
+        .unwrap_or(stats::blank_stats());
     let mut fetch_timestamp = Utc::now();
 
     loop {
@@ -72,7 +74,8 @@ fn main() {
             refetch_timer = 0;
 
             fetched = fetched_next.clone();
-            fetched_next = stats::fetch_stats();
+            fetched_next = stats::fetch_stats()
+                .unwrap_or(fetched.clone());
             fetch_timestamp = Utc::now();
         }
 
