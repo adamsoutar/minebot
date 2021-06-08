@@ -14,3 +14,9 @@ pub fn d(duration_secs: i64) -> String {
     let dur_years = dur.num_days() / 365;
     format!("`{}h {}m {}s` _({} years!)_", n(dur_hrs), n(dur_mins), n(dur_secs), n(dur_years))
 }
+
+// Formats percentages
+pub fn p(num: i64, out_of: i64) -> String {
+    let perc = (num as f64 / out_of as f64) * 100.;
+    format!("{}%", perc)
+}

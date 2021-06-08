@@ -4,7 +4,7 @@ use discord::model::{
 };
 use discord::Discord;
 use chrono::prelude::*;
-use crate::formatting::{n, d};
+use crate::formatting::{n, d, p};
 
 mod stats;
 mod interp;
@@ -70,12 +70,16 @@ fn main() {
 
         let msg_content = format!("
 <:logo:787035070866784256> **Cubes attempted:** `{}`
-<:explodedMine:787032733175644201> **Cubes exploded:** `{}`
-<:tileFlagged:787032733280370769> **Cubes solved:** `{}`
+<:explodedMine:787032733175644201> **Cubes exploded:** `{}` ({})
+<:tileFlagged:787032733280370769> **Cubes solved:** `{}` ({})
+
 :raising_hand: **Players:** `{}`
 :stopwatch: **Combined time played:** {}",
-        n(values["gamesPlayed"]), n(values["cubesExploded"]), n(values["cubesSolved"]),
-        n(values["playerCount"]), d(values["playTimeSeconds"]));
+        n(values["gamesPlayed"]),
+        n(values["cubesExploded"]), p(values["cubesExploded"], values["gamesPlayed"]),
+        n(values["cubesSolved"]), p(values["cubesSolved"], values["gamesPlayed"]),
+        n(values["playerCount"]),
+        d(values["playTimeSeconds"]));
 
         discord.edit_message(channel_id, message_id, &msg_content).unwrap();
 
