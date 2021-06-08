@@ -18,5 +18,5 @@ pub fn d(duration_secs: i64) -> String {
 // Formats percentages
 pub fn p(num: i64, out_of: i64) -> String {
     let perc = (num as f64 / out_of as f64) * 100.;
-    format!("{}%", perc)
+    format!("{}%", perc as i64)
 }
