@@ -81,7 +81,7 @@ fn main() {
         n(values["playerCount"]),
         d(values["playTimeSeconds"]));
 
-        discord.edit_message(channel_id, message_id, &msg_content).unwrap();
+        let _ = discord.edit_message(channel_id, message_id, &msg_content);
 
         thread::sleep(update_time);
     }
