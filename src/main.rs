@@ -5,13 +5,14 @@ use discord::model::{
 use discord::Discord;
 use chrono::prelude::*;
 use crate::formatting::{n, d, p};
+use reqwest::Result;
 
 mod stats;
 mod interp;
 mod formatting;
 
 // Bot will interpolate and edit the message every $this seconds
-static UPDATE_PERIOD: u64 = 1000;
+static UPDATE_PERIOD: u64 = 5000;
 // This is the period we interpolate between
 static REFETCH_PERIOD: u64 = 300000;
 // We don't use all fields of the response
@@ -23,6 +24,16 @@ static INTERP_FIELDS: &[&str] = &[
 fn get_env_var(name: &str) -> String {
     env::var(name)
         .expect(&format!("Missing {} env var", name)[..])
+}
+
+fn unwrap_or_with_log<T: std::fmt::Debug> (result: Result<T>, alternative: T) -> T {
+  if result.is_ok() {
+    result.unwrap()
+  } else {
+    eprintln!("Error fetching stats! - {}", result.unwrap_err().to_string());
+
+    alternative
+  }
 }
 
 fn main() {
@@ -49,8 +60,7 @@ fn main() {
     let update_time = time::Duration::from_millis(UPDATE_PERIOD);
     let mut refetch_timer = 0;
 
-    let mut fetched = stats::fetch_stats()
-        .unwrap_or(stats::blank_stats());
+    let mut fetched = unwrap_or_with_log(stats::fetch_stats(), stats::blank_stats());
     let mut fetched_next = fetched.clone();
     let mut fetch_timestamp = Utc::now();
 
@@ -61,8 +71,7 @@ fn main() {
             refetch_timer = 0;
 
             fetched = fetched_next.clone();
-            fetched_next = stats::fetch_stats()
-                .unwrap_or(fetched.clone());
+            fetched_next = unwrap_or_with_log(stats::fetch_stats(), fetched.clone());
             fetch_timestamp = Utc::now();
         }
 
