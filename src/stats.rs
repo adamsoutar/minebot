@@ -7,7 +7,7 @@ pub fn fetch_stats() -> reqwest::Result<HashMap<&'static str, i64>> {
 
     println!("resp_text: \"{}\"", resp_text);
 
-    let json: Value = serde_json::from_str(&resp_text[..])?;
+    let json: Value = serde_json::from_str(&resp_text[..]).unwrap();
     let mut hash_map = HashMap::new();
 
     for field in crate::INTERP_FIELDS {
