@@ -5,7 +5,7 @@ pub fn fetch_stats() -> reqwest::Result<HashMap<&'static str, i64>> {
     let url = crate::get_env_var("ENDPOINT");
     let resp_text = reqwest::blocking::get(url)?.text()?;
 
-    println!("resp_text: \"{}\"", resp_text);
+    // println!("resp_text: \"{}\"", resp_text);
 
     let json: Value = serde_json::from_str(&resp_text[..]).unwrap();
     let mut hash_map = HashMap::new();
