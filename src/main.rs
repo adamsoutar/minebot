@@ -1,15 +1,13 @@
-use std::{env, thread, time};
-use discord::model::{
-    ChannelId, MessageId, Game, GameType, OnlineStatus
-};
-use discord::Discord;
+use crate::formatting::{d, n, p};
 use chrono::prelude::*;
-use crate::formatting::{n, d, p};
+use discord::model::{ChannelId, Game, GameType, MessageId, OnlineStatus};
+use discord::Discord;
 use reqwest::Result;
+use std::{env, thread, time};
 
-mod stats;
-mod interp;
 mod formatting;
+mod interp;
+mod stats;
 
 // Bot will interpolate and edit the message every $this seconds
 static UPDATE_PERIOD: u64 = 5000;
@@ -17,39 +15,46 @@ static UPDATE_PERIOD: u64 = 5000;
 static REFETCH_PERIOD: u64 = 300000;
 // We don't use all fields of the response
 static INTERP_FIELDS: &[&str] = &[
-    "gamesPlayed", "cubesSolved", "cubesExploded",
-    "playTimeSeconds", "playerCount"
+    "gamesPlayed",
+    "cubesSolved",
+    "cubesExploded",
+    "playTimeSeconds",
+    "playerCount",
 ];
 
 fn get_env_var(name: &str) -> String {
-    env::var(name)
-        .expect(&format!("Missing {} env var", name)[..])
+    env::var(name).expect(&format!("Missing {} env var", name)[..])
 }
 
-fn unwrap_or_with_log<T: std::fmt::Debug> (result: Result<T>, alternative: T) -> T {
-  if result.is_ok() {
-    result.unwrap()
-  } else {
-    eprintln!("Error fetching stats! - {}", result.unwrap_err().to_string());
+fn unwrap_or_with_log<T: std::fmt::Debug>(result: Result<T>, alternative: T) -> T {
+    if result.is_ok() {
+        result.unwrap()
+    } else {
+        eprintln!(
+            "Error fetching stats! - {}",
+            result.unwrap_err().to_string()
+        );
 
-    alternative
-  }
+        alternative
+    }
 }
 
 fn main() {
     let token = get_env_var("BOT_TOKEN");
-    let discord = Discord::from_bot_token(&token)
-		.expect("Failed to log into Discord");
+    let discord = Discord::from_bot_token(&token).expect("Failed to log into Discord");
 
-    let (connection, _) = discord.connect()
-        .expect("Failed to connect to Discord");
+    let (connection, _) = discord.connect().expect("Failed to connect to Discord");
 
     // Show our login in the client
-    connection.set_presence(Some(Game {
-        name: "Mastermine (obviously 😛)".to_string(),
-        kind: GameType::Playing,
-        url: Some("https://mastermine.app/".to_string())
-    }), OnlineStatus::Online, false);
+    connection.set_presence(
+        Some(Game {
+            name: "Mastermine (obviously 😛)".to_string(),
+            kind: GameType::Playing,
+            url: Some("https://mastermine.app/".to_string()),
+        }),
+        OnlineStatus::Online,
+        false,
+    );
 
     let channel_num: u64 = get_env_var("CHANNEL_ID").parse().unwrap();
     let message_num: u64 = get_env_var("MESSAGE_ID").parse().unwrap();
@@ -77,18 +82,22 @@ fn main() {
 
         let values = interp::interp_stats(&fetched, &fetched_next, fetch_timestamp);
 
-        let msg_content = format!("
+        let msg_content = format!(
+            "
 <:logo:787035070866784256> **Cubes attempted:** `{}`
 <:explodedMine:787032733175644201> **Cubes exploded:** `{}` ({})
 <:tileFlagged:787032733280370769> **Cubes solved:** `{}` ({})
 
 :raising_hand: **Players:** `{}`
 :stopwatch: **Combined time played:** {}",
-        n(values["gamesPlayed"]),
-        n(values["cubesExploded"]), p(values["cubesExploded"], values["gamesPlayed"]),
-        n(values["cubesSolved"]), p(values["cubesSolved"], values["gamesPlayed"]),
-        n(values["playerCount"]),
-        d(values["playTimeSeconds"]));
+            n(values["gamesPlayed"]),
+            n(values["cubesExploded"]),
+            p(values["cubesExploded"], values["gamesPlayed"]),
+            n(values["cubesSolved"]),
+            p(values["cubesSolved"], values["gamesPlayed"]),
+            n(values["playerCount"]),
+            d(values["playTimeSeconds"])
+        );
 
         let _ = discord.edit_message(channel_id, message_id, &msg_content);
 

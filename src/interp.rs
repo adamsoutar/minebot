@@ -2,15 +2,14 @@ use chrono::prelude::*;
 use std::collections::HashMap;
 
 // Take two stats collections and find the values in the middle based on the time
-pub fn interp_stats (
+pub fn interp_stats(
     prev: &HashMap<&str, i64>,
     next: &HashMap<&str, i64>,
-    timestamp: DateTime::<Utc>
+    timestamp: DateTime<Utc>,
 ) -> HashMap<&'static str, i64> {
     let now = Utc::now();
-    let prog = now
-        .signed_duration_since(timestamp)
-        .num_milliseconds() as f64 / crate::REFETCH_PERIOD as f64;
+    let prog = now.signed_duration_since(timestamp).num_milliseconds() as f64
+        / crate::REFETCH_PERIOD as f64;
 
     let mut interped = HashMap::new();
 
